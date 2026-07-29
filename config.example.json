@@ -1,0 +1,33 @@
+{
+  "port": 56170,
+  "accessToken": "",
+  "ai": {
+    "endpoint": "https://api.deepseek.com/chat/completions",
+    "apiKey": "YOUR_DEEPSEEK_API_KEY",
+    "model": "deepseek-chat"
+  },
+  "hot": {
+    "endpoint": "https://api.example.com/v1/hotlist",
+    "method": "GET",
+    "headers": {
+      "Authorization": "Bearer YOUR_THIRD_PARTY_API_KEY"
+    },
+    "query": {},
+    "fields": {
+      "list": "data.list",
+      "title": "title",
+      "platform": "platform",
+      "tags": "tags",
+      "notes": "notes"
+    },
+    "platformMap": {
+      "douyin": "douyin",
+      "dy": "douyin",
+      "douyin_video": "douyin",
+      "xhs": "xhs",
+      "xiaohongshu": "xhs",
+      "red": "xhs"
+    },
+    "defaultPlatform": "xhs"
+  }
+}
