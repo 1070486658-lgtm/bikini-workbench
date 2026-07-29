@@ -1,0 +1,8 @@
+node_modules/
+data/
+config.json
+*.log
+server.log
+.DS_Store
+.git/
+.gitignore
