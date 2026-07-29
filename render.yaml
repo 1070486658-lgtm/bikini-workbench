@@ -1,0 +1,27 @@
+# Render Blueprint —— 一键部署「真·云端完整版」
+# 用法：把这个目录推到 GitHub，在 Render 新建 Blueprint（render.yaml）即自动建好服务+持久盘。
+# 文档见 DEPLOY.md。
+services:
+  - type: web
+    name: bikini-workbench
+    runtime: node
+    plan: starter            # 持久盘需要付费套餐（starter 起）；免费档不保证常驻且无法挂盘
+    branch: main
+    buildCommand: "echo skip-build"
+    startCommand: "node server.js"
+    healthCheckPath: /api/health
+    envVars:
+      - key: DATA_DIR         # 数据落到持久盘，重启/重新部署不丢
+        value: /data
+      - key: ACCESS_TOKEN     # 自动生成随机令牌，部署后在 Dashboard 里查看并填进 App 设置
+        generateValue: true
+      - key: AI_API_KEY       # 填你的 DeepSeek key（留空则 App 内 AI 不可用，其他照常）
+        sync: false
+      - key: AI_ENDPOINT
+        sync: false
+      - key: AI_MODEL
+        sync: false
+    disk:
+      name: workbench-data
+      mountPath: /data
+      sizeGB: 1
