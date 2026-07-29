@@ -1,0 +1,7 @@
+node_modules/
+/data/
+config.json
+*-inbox.json
+*.log
+server.log
+.DS_Store
