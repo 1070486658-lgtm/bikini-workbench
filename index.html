@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>我的工作台</title>
+<meta name="theme-color" content="#0B2B3D">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.json">
+<link rel="stylesheet" href="styles.css?v=3">
+</head>
+<body>
+<div class="app">
+  <nav class="bottom-nav">
+    <div class="nav-item active" data-page="overview" style="--accent:var(--c-overview)"><span class="icon">🧭</span><span class="label">总览</span></div>
+    <div class="nav-item" data-page="today" style="--accent:var(--c-today)"><span class="icon">☀️</span><span class="label">今天</span></div>
+    <div class="nav-item" data-page="photo" style="--accent:var(--c-photo)"><span class="icon">🐚</span><span class="label">摄影</span></div>
+    <div class="nav-item" data-page="fund" style="--accent:var(--c-fund)"><span class="icon">🦪</span><span class="label">基金</span></div>
+    <div class="nav-item" data-page="learn" style="--accent:var(--c-learn)"><span class="icon">📖</span><span class="label">学习</span></div>
+    <div class="nav-item" data-page="incubator" style="--accent:var(--c-incubator)"><span class="icon">🏰</span><span class="label">孵化</span></div>
+    <div class="nav-item" data-page="settings" style="--accent:var(--c-settings)"><span class="icon">🥥</span><span class="label">设置</span></div>
+  </nav>
+
+  <main class="content">
+    <!-- 总览 -->
+    <section class="page active" id="page-overview" style="--accent:var(--c-overview)">
+      <div class="page-header"><h1>👋 今天该做什么</h1><div class="subtitle" id="overview-date"></div></div>
+      <div id="overview-digest"></div>
+      <div class="stat-grid" id="overview-stats"></div>
+      <div class="card">
+        <div class="card-title"><span class="accent-bar"></span>📋 今日任务</div>
+        <div id="overview-tasks"></div>
+        <div class="form-row mt-12">
+          <button class="btn btn-ghost" style="flex:1" onclick="generateTodayTemplate()">🤖 一键生成</button>
+          <button class="btn btn-primary" style="flex:1" onclick="openTaskModal()">➕ 添加任务</button>
+        </div>
+        <button class="btn btn-ghost btn-block btn-sm mt-8" onclick="aiPlanToday()">✨ AI 帮我安排今天</button>
+      </div>
+      <div id="overview-modules"></div>
+      <div id="overview-freed"></div>
+    </section>
+
+    <!-- 今天 -->
+    <section class="page" id="page-today" style="--accent:var(--c-today)">
+      <div class="page-header"><h1>📋 今天干啥</h1><div class="subtitle" id="today-date"></div></div>
+      <div id="today-tasks"></div>
+      <div class="form-row mt-12">
+        <button class="btn btn-ghost" style="flex:1" onclick="generateTodayTemplate()">🤖 一键生成</button>
+        <button class="btn btn-primary" style="flex:1" onclick="openTaskModal()">➕ 添加任务</button>
+      </div>
+      <button class="btn btn-primary btn-block mt-12" onclick="aiPlanToday()">✨ AI 帮我安排今天</button>
+    </section>
+
+    <!-- 摄影 -->
+    <section class="page" id="page-photo" style="--accent:var(--c-photo)">
+      <div class="page-header"><h1>📷 摄影搞钱</h1><div class="subtitle">爆款 · 样片 · 复盘 · 灵感</div></div>
+      <div class="tabs" id="photo-tabs">
+        <div class="tab active" data-tab="discover">🎯 发现</div>
+        <div class="tab" data-tab="hot">🔥 热点</div>
+        <div class="tab" data-tab="sample">📸 样片</div>
+        <div class="tab" data-tab="review">📈 复盘</div>
+        <div class="tab" data-tab="inspiration">💡 灵感</div>
+      </div>
+      <div class="tab-panel active" id="panel-discover">
+        <div class="flex-between" style="margin-bottom:8px">
+          <span class="text-sm text-muted" id="discover-info"></span>
+          <button class="btn btn-ghost btn-sm" onclick="discoverFetchFromProvider()">🔄 数据源抓取</button>
+        </div>
+        <div id="discover-stack"></div>
+        <button class="btn btn-primary btn-block mt-12" onclick="openDiscoverImportModal()">📥 导入爆款帖子</button>
+        <div id="discover-trend" class="mt-12"></div>
+      </div>
+      <div class="tab-panel" id="panel-hot">
+        <div class="card">
+          <div class="card-title"><span class="accent-bar"></span>我的摄影风格</div>
+          <div class="pill-select" id="style-pills"></div>
+          <p class="text-sm text-muted">勾选你的风格，热点里符合的会标「✨你的风格」</p>
+        </div>
+        <div class="card">
+          <div class="card-title"><span class="accent-bar"></span>热点扒扒</div>
+          <div class="flex-between" style="margin-bottom:8px">
+            <span id="hot-refresh-time" class="text-sm text-muted"></span>
+            <button class="btn btn-ghost btn-sm" onclick="refreshBackendHot()">🔄 抓取</button>
+          </div>
+          <div id="photo-hot-list"></div>
+          <button class="btn btn-ghost btn-block btn-sm mt-12" onclick="openHotModal()">➕ 手动记录热点</button>
+        </div>
+      </div>
+      <div class="tab-panel" id="panel-sample">
+        <div id="photo-samples"></div>
+        <div class="form-row mt-12">
+          <button class="btn btn-primary" style="flex:1" onclick="openSampleModal()">➕ 存一张样片</button>
+          <button class="btn btn-ghost" style="flex:1" onclick="aiAnalyzeSamples()">💰 AI 分析赚钱</button>
+        </div>
+      </div>
+      <div class="tab-panel" id="panel-review">
+        <div id="photo-reviews"></div>
+        <div class="form-row mt-12">
+          <button class="btn btn-ghost" style="flex:1" onclick="openReviewModal()">➕ 手动复盘</button>
+          <button class="btn btn-primary" style="flex:1" onclick="openAiReviewModal()">🤖 AI 复盘一条</button>
+        </div>
+        <button class="btn btn-ghost btn-block btn-sm mt-8" onclick="openAiPlanModal()">🤖 策划下一条</button>
+      </div>
+      <div class="tab-panel" id="panel-inspiration">
+        <div class="card" id="weekly-inspiration" style="border-left:4px solid var(--c-photo)"></div>
+        <div id="photo-inspirations"></div>
+        <button class="btn btn-primary btn-block mt-12" onclick="openInspirationModal()">➕ 存一条灵感</button>
+      </div>
+    </section>
+
+    <!-- 基金 -->
+    <section class="page" id="page-fund" style="--accent:var(--c-fund)">
+      <div class="page-header"><h1>💰 基金理财</h1><div class="subtitle">持仓 · 瞎猜 · 记录 · 算账</div></div>
+      <div class="tabs" id="fund-tabs">
+        <div class="tab active" data-tab="portfolio">💼 我买了啥</div>
+        <div class="tab" data-tab="guess">🎯 瞎猜</div>
+        <div class="tab" data-tab="trade">📝 记录</div>
+        <div class="tab" data-tab="monthly">📅 算账</div>
+      </div>
+      <div class="tab-panel active" id="panel-portfolio">
+        <div id="fund-portfolio"></div>
+        <button class="btn btn-primary btn-block mt-12" onclick="openFundModal()">➕ 添加基金</button>
+      </div>
+      <div class="tab-panel" id="panel-guess">
+        <div id="fund-guesses"></div>
+        <button class="btn btn-primary btn-block mt-12" onclick="openGuessModal()">➕ 本周猜一把</button>
+      </div>
+      <div class="tab-panel" id="panel-trade">
+        <div id="fund-trades"></div>
+        <button class="btn btn-primary btn-block mt-12" onclick="openTradeModal()">➕ 记一笔操作</button>
+      </div>
+      <div class="tab-panel" id="panel-monthly">
+        <div id="fund-monthly"></div>
+        <button class="btn btn-primary btn-block mt-12" onclick="openMonthlyModal()">➕ 新建月度账单</button>
+      </div>
+    </section>
+
+    <!-- 学习 -->
+    <section class="page" id="page-learn" style="--accent:var(--c-learn)">
+      <div class="page-header"><h1>📚 学点本事</h1><div class="subtitle">想学 · 进度 · 实践</div></div>
+      <div class="card">
+        <div class="card-title"><span class="accent-bar"></span>想学清单</div>
+        <div id="learn-wishlist"></div>
+        <button class="btn btn-ghost btn-block btn-sm mt-12" onclick="openWishlistModal()">➕ 加一个想学的</button>
+      </div>
+      <div class="section-label">学到哪了</div>
+      <div id="learn-skills"></div>
+      <button class="btn btn-primary btn-block mt-12" onclick="openSkillModal()">➕ 新建学习计划</button>
+    </section>
+
+    <!-- 孵化 -->
+    <section class="page" id="page-incubator" style="--accent:var(--c-incubator)">
+      <div class="page-header"><h1>🚀 孵化池</h1><div class="subtitle">想法 · 项目 · 资源</div></div>
+      <div class="card">
+        <div class="card-title"><span class="accent-bar"></span>想法垃圾桶</div>
+        <p class="text-sm text-muted mb-8">有想法就丢进来，不写会忘，写了不焦虑。</p>
+        <div id="incubator-ideas"></div>
+        <div class="form-row mt-12">
+          <input type="text" class="form-input" id="quick-idea-input" placeholder="突然想到啥了？写下来..." onkeypress="if(event.key==='Enter')addQuickIdea()">
+          <button class="btn btn-primary btn-sm" onclick="addQuickIdea()">丢进去</button>
+        </div>
+      </div>
+      <div class="section-label">项目进度条</div>
+      <div id="incubator-projects"></div>
+      <button class="btn btn-primary btn-block mt-12" onclick="openProjectModal()">➕ 新建项目</button>
+      <div class="section-label">我还缺啥</div>
+      <div id="incubator-needs"></div>
+      <button class="btn btn-ghost btn-block btn-sm mt-12" onclick="openNeedModal()">➕ 添加缺失资源</button>
+    </section>
+
+    <!-- 设置 -->
+    <section class="page" id="page-settings" style="--accent:var(--c-settings)">
+      <div class="page-header"><h1>⚙️ 设置</h1><div class="subtitle">数据 · 同步 · 关于</div></div>
+      <div class="card">
+        <div class="card-title"><span class="accent-bar"></span>💾 数据备份</div>
+        <p class="text-sm text-muted mb-8">数据存在本机浏览器，换电脑会丢。换机前先「导出备份」，到新电脑打开工作台再「导入数据」，全部内容原样恢复。</p>
+        <div class="form-row">
+          <button class="btn btn-primary" style="flex:1" onclick="exportData()">⬇️ 导出备份</button>
+          <button class="btn btn-ghost" style="flex:1" onclick="document.getElementById('import-file').click()">⬆️ 导入数据</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="accent-bar"></span>🔗 热点后端地址</div>
+        <p class="text-sm text-muted mb-8">留空=内置内容池（每天自动更新）；把热点后端部署到云端后，填这里的地址即可跨设备同步热点。</p>
+        <div class="form-group" style="margin-bottom:10px">
+          <input class="form-input" id="backend-url-input" placeholder="https://你的域名（留空用内置内容池）">
+        </div>
+        <button class="btn btn-ghost btn-block btn-sm" onclick="saveBackendUrl()">保存后端地址</button>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="accent-bar"></span>🔐 云端访问令牌</div>
+        <p class="text-sm text-muted mb-8">部署到公网并设置了 ACCESS_TOKEN 时填写，用来鉴权同步与 AI。留空=不校验（仅本地/内网使用）。</p>
+        <div class="form-group" style="margin-bottom:10px">
+          <input class="form-input" id="access-token-input" type="password" placeholder="部署时设置的 ACCESS_TOKEN（留空则不校验）">
+        </div>
+        <button class="btn btn-ghost btn-block btn-sm" onclick="saveAccessToken()">保存令牌</button>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="accent-bar"></span>ℹ️ 关于同步</div>
+        <p class="text-sm text-muted" style="line-height:1.75">· 所有笔记、任务、想法、基金记录都存在<strong>本机浏览器</strong>，不会上传服务器，换设备需手动导出 / 导入。<br>· <strong>基金行情</strong>走公开接口，任何设备打开自动获取，无需迁移。<br>· <strong>热点内容</strong>默认来自内置内容池；如需跨设备一致，可在上方填写云端后端地址。</p>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div class="modal-overlay" id="modal-overlay"><div class="modal" id="modal-content"></div></div>
+<input type="file" id="import-file" accept="application/json,.json" style="display:none" onchange="importData(this.files[0]);this.value=''">
+<script src="app.js"></script>
+</body>
+</html>
